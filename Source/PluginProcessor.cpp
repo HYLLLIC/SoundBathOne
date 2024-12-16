@@ -159,7 +159,7 @@ void SoundBathOneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            channelData[sample] = distribution(randomGenerator);
+            channelData[sample] = distribution(randomGenerator) * volume;
         }
     }
 }
@@ -195,3 +195,6 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new SoundBathOneAudioProcessor();
 }
+
+//CUSTOM========================================================================
+//void setVolume(float newVolume) { volume = newVolume; }

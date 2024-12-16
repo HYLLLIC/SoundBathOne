@@ -53,7 +53,11 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
-
+    
+    //CUSTOM========================================================================
+    float volume = 0.5f;
+    void setVolume(float newVolume) { volume = newVolume;}
+    
 private:
     std::random_device randomDevice;
     std::mt19937 randomGenerator;
