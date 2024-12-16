@@ -11,20 +11,12 @@
 
 //==============================================================================
 SoundBathOneAudioProcessor::SoundBathOneAudioProcessor()
-#ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       )
-     , randomGenerator(randomDevice())
-     , distribution(-1.0f, 1.0f)
-
-#endif
+: AudioProcessor(BusesProperties()
+                     .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
+      randomGenerator(randomDevice()),
+      distribution(-1.0f, 1.0f)
 {
+//    DBG("Noise Generator Initialized");
 }
 
 SoundBathOneAudioProcessor::~SoundBathOneAudioProcessor()
@@ -97,6 +89,7 @@ void SoundBathOneAudioProcessor::changeProgramName (int index, const juce::Strin
 void SoundBathOneAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     juce::ignoreUnused(sampleRate, samplesPerBlock);
+    //DBG("prepareToPlay called: sampleRate=" << sampleRate << ", blockSize=" << samplesPerBlock);
 }
 
 void SoundBathOneAudioProcessor::releaseResources()
@@ -133,36 +126,18 @@ bool SoundBathOneAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 
 void SoundBathOneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    juce::ScopedNoDenormals noDenormals;
-    juce::ignoreUnused(midiMessages);
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
-
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    //DBG("processBlock called");
+    // Ensure all output channels are filled with a fixed signal for testing
+    for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
     {
-        auto* channelData = buffer.getWritePointer (channel);
-
+        auto* channelData = buffer.getWritePointer(channel);
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
             channelData[sample] = distribution(randomGenerator) * volume;
         }
     }
 }
+
 
 //==============================================================================
 bool SoundBathOneAudioProcessor::hasEditor() const

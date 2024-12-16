@@ -55,13 +55,13 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
     
     //CUSTOM========================================================================
-    float volume = 0.5f;
     void setVolume(float newVolume) { volume = newVolume;}
     
 private:
     std::random_device randomDevice;
     std::mt19937 randomGenerator;
     std::uniform_real_distribution<float>(distribution);
+    float volume = 0.5f;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoundBathOneAudioProcessor)
