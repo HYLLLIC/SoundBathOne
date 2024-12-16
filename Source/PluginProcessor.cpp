@@ -20,6 +20,9 @@ SoundBathOneAudioProcessor::SoundBathOneAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        )
+     , randomGenerator(randomDevice())
+     , distribution(-1.0f, 1.0f)
+
 #endif
 {
 }
@@ -93,8 +96,7 @@ void SoundBathOneAudioProcessor::changeProgramName (int index, const juce::Strin
 //==============================================================================
 void SoundBathOneAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    juce::ignoreUnused(sampleRate, samplesPerBlock);
 }
 
 void SoundBathOneAudioProcessor::releaseResources()
@@ -132,6 +134,7 @@ bool SoundBathOneAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 void SoundBathOneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
+    juce::ignoreUnused(midiMessages);
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
@@ -154,7 +157,10 @@ void SoundBathOneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     {
         auto* channelData = buffer.getWritePointer (channel);
 
-        // ..do something to the data...
+        for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
+        {
+            channelData[sample] = distribution(randomGenerator);
+        }
     }
 }
 

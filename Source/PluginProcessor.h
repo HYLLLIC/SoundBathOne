@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include <random>
 
 //==============================================================================
 /**
@@ -54,6 +55,10 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 private:
+    std::random_device randomDevice;
+    std::mt19937 randomGenerator;
+    std::uniform_real_distribution<float>(distribution);
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoundBathOneAudioProcessor)
 };
